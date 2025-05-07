@@ -6,6 +6,7 @@ import cv2
 import os
 import requests
 import uuid
+import uvicorn
 
 app = FastAPI()
 
@@ -88,3 +89,8 @@ def compare_faces(request: FaceComparisonRequest):
         return { "match": True, "matchesFound": matchesFound, "message": "Face in image matches a face in video", "result": result }
     else:
         return { "match": False, "matchesFound": matchesFound, "message": "No match found", "result": result }
+
+
+if __name__ == "__main__":
+    PORT = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
