@@ -7,6 +7,7 @@ import os
 import requests
 import uuid
 import uvicorn
+from datetime import datetime
 
 app = FastAPI()
 
@@ -26,6 +27,7 @@ def download_file(url, suffix):
                 f.write(chunk)
         return local_filename
     else:
+        print(f"exception in downloading {response.text}")
         raise Exception(f"Failed to download file: {url}")
 
 
@@ -35,7 +37,6 @@ def extract_faces_from_video(video_path):
     frame_skip = 10  # Process every 10th frame for efficiency
     frame_count = 0
     frame_paths = []
-
     while True:
         ret, frame = video_capture.read()
         temp_dir = tempfile.gettempdir()
@@ -74,6 +75,8 @@ def compare_faces(request: FaceComparisonRequest):
             result = DeepFace.verify(img1_path=image_file, img2_path=frame_path, enforce_detection=False)
             if result["verified"]:
                 matchesFound += 1
+            if matchesFound >= len(frame_paths) / 2:
+                break
         except Exception as e:
             print(f"Error processing frame: {frame_path}: {e}")
             continue
